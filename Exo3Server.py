@@ -1,4 +1,3 @@
-from http import client
 import socket
 
 HOST = ""  # Any interface address (localhost)
@@ -11,9 +10,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listeningSocket:
     print(f"Connected by {address}")
     with clientSocket:
         while True:
-            data = clientSocket.recv(1024)
-            if data == (b'fini\r\n'):
+            message = clientSocket.recv(1024).decode('utf-8')
+            if 'fini' in message:
                 break
-            print(data)
-            response = bytes(input('Réponse : ') + '\r\n', 'utf-8')
+            print(message)
+            response = bytes(input('Réponse : '), 'utf-8')
             clientSocket.sendall(response)
