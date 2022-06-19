@@ -9,6 +9,7 @@ PORT = 55555
 listeningSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 listeningSocket.bind((HOST, PORT))
 listeningSocket.listen()
+print('Serveur de chat démarré')
 
 # Lists For Clients and Their noms
 clients = []
@@ -31,30 +32,27 @@ def handle(client):
             index = clients.index(client)
             clients.remove(client)
             client.close()
-            nom = noms[index]
+            nom = noms[index]            
             broadcast('{} a quitté le chat!'.format(nom).encode('utf-8'))
+            print('{} a quitté le chat!'.format(nom))
             noms.remove(nom)
             break
 
-# Receiving / Listening Function
-def receive():
-    while True:
-        # Accept Connection
-        client, address = listeningSocket.accept()
-        print("Nouvelle connexion avec {}".format(str(address)))
+while True:
+    # Accept Connection
+    client, address = listeningSocket.accept()
+    print("Nouvelle connexion avec {}".format(str(address)))
 
-        # Request And Store nom
-        client.send('NOM'.encode('utf-8'))
-        nom = client.recv(1024).decode('utf-8')
-        noms.append(nom)
-        clients.append(client)
+    # Request And Store nom
+    client.send('NOM'.encode('utf-8'))
+    nom = client.recv(1024).decode('utf-8')
+    noms.append(nom)
+    clients.append(client)
 
-        # Print And Broadcast nom
-        print("Nom: {}".format(nom))
-        broadcast("{} a rejoint le chat!".format(nom).encode('utf-8'))
+    # Print And Broadcast nom
+    print("{} a rejoint le chat!".format(nom))
+    broadcast("{} a rejoint le chat!".format(nom).encode('utf-8'))
 
-        # Start Handling Thread For Client
-        thread = threading.Thread(target=handle, args=(client,))
-        thread.start()
-
-receive()
+    # Start Handling Thread For Client
+    thread = threading.Thread(target=handle, args=(client,))
+    thread.start()
